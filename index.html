@@ -381,11 +381,17 @@
       </div>
       <div class="form-group">
         <label>SAP</label>
-        <input type="text" id="sap" placeholder="Nomor SAP" autocomplete="off">
+        <input type="text" id="sap" placeholder="SAP/4 digit No KTP terakhir" autocomplete="off">
       </div>
       <div class="form-group">
-        <label>Unit Kerja</label>
-        <input type="text" id="unit_kerja" placeholder="Unit Kerja / Departemen" autocomplete="organization">
+        <label>Kategori</label>
+        <select id="kategori" style="width:100%;padding:12px 14px;background:var(--input-bg);border:1px solid var(--input-border);border-radius:12px;color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:all 0.2s;appearance:auto;">
+          <option value="" disabled selected>Pilih Kategori</option>
+          <option value="Karyawan">Karyawan</option>
+          <option value="Outsourching">Outsourching</option>
+          <option value="Afiliasi">Afiliasi</option>
+          <option value="Umum">Umum</option>
+        </select>
       </div>
 
       <div class="error-msg" id="error1">Harap isi semua field!</div>
@@ -494,16 +500,16 @@ function swipeTo(idx) {
 function lanjutKeTebak() {
   const nama = document.getElementById('nama').value.trim();
   const sap = document.getElementById('sap').value.trim();
-  const unit = document.getElementById('unit_kerja').value.trim();
+  const kategori = document.getElementById('kategori').value;
   const err = document.getElementById('error1');
 
-  if (!nama || !sap || !unit) {
+  if (!nama || !sap || !kategori) {
     err.textContent = 'Harap isi semua field!';
     err.style.display = 'block';
     return;
   }
   err.style.display = 'none';
-  formData = { nama, sap, unit_kerja: unit };
+  formData = { nama, sap, kategori };
   swipeTo(1);
 }
 

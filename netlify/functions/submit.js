@@ -69,7 +69,7 @@ exports.handler = async (event) => {
         return { statusCode: 409, headers, body: JSON.stringify({ error: 'Anda sudah pernah mengisi. 1 device hanya 1x submit.' }) };
       }
       const c = await appendRow('tebakskor', [
-        data.nama || '', data.sap || '', data.unit_kerja || '',
+        data.nama || '', data.sap || '', data.kategori || '',
         data.juara || '', String(data.skor_arg ?? ''), String(data.skor_spa ?? ''),
       ]);
       return { statusCode: 200, headers, body: JSON.stringify({ status: 'ok', cells: c }) };
