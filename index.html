@@ -381,7 +381,7 @@
       </div>
       <div class="form-group">
         <label>Identitas</label>
-        <input type="text" id="sap" placeholder="SAP/4 digit No KTP terakhir" autocomplete="off">
+        <input type="text" id="sap" placeholder="SAP/4 digit No KTP terakhir" autocomplete="off" inputmode="numeric" pattern="[0-9]{4,}">
       </div>
       <div class="form-group">
         <label>Kategori</label>
@@ -505,6 +505,11 @@ function lanjutKeTebak() {
 
   if (!nama || !sap || !kategori) {
     err.textContent = 'Harap isi semua field!';
+    err.style.display = 'block';
+    return;
+  }
+  if (!/^[0-9]{4,}$/.test(sap)) {
+    err.textContent = 'Identitas minimal 4 angka!';
     err.style.display = 'block';
     return;
   }
