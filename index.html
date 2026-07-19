@@ -393,14 +393,11 @@
   <!-- PAGE 1: DAFTAR HADIR -->
   <div class="page active" id="page1">
     <div class="card">
-      <div class="header">
-        <div class="badge">Nonton Bareng</div>
-        <div class="header-logo-row">
-          <img src="logo-fwc26.png" alt="World Cup 2026" class="logo-fwc">
-          <h1>Nobar Gembira</h1>
-        </div>
-        <h2>Semen Tonasa</h2>
-        <div class="worldcup">⚽ Final World Cup 2026</div>
+      <div class="header" style="text-align:center;">
+        <img src="logo-fwc26.png" alt="World Cup 2026" class="logo-fwc" style="display:block;margin:0 auto 12px;width:56px;height:auto;animation:float 3s ease-in-out infinite;">
+        <h1 style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px;">Nobar Gembira</h1>
+        <h2 style="font-size:14px;font-weight:400;color:var(--text2);margin-bottom:2px;letter-spacing:1px;">Semen Tonasa</h2>
+        <div style="font-size:12px;font-weight:600;color:var(--accent2);background:rgba(230,57,70,0.12);padding:4px 16px;border-radius:20px;display:inline-block;margin-top:4px;">Final World Cup 2026</div>
       </div>
       <div class="divider"></div>
 
@@ -503,7 +500,7 @@ async function apiPost(path, data) {
   try {
     return JSON.parse(text);
   } catch (e) {
-    throw new Error('Server error. Pastikan Netlify env vars (GOOGLE_REFRESH_TOKEN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) sudah diset di dashboard Netlify.');
+    throw new Error('Server error. Status: ' + resp.status + '. Response: ' + text.substring(0, 200));
   }
 }
 
