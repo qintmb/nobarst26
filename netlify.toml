@@ -1,8 +1,7 @@
 [build]
-  functions = "netlify/functions"
+  functions = "functions"
   publish = "."
 
-# Redirect /api/* to the Netlify function (preserves path)
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/submit"
