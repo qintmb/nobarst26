@@ -1,0 +1,8 @@
+{
+  "name": "nobar-gembira",
+  "version": "1.0.0",
+  "description": "Nobar Gembira - Final World Cup 2026",
+  "dependencies": {
+    "googleapis": "^140.0.0"
+  }
+}
