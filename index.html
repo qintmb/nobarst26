@@ -17,6 +17,7 @@
     --accent2: #e63946;
     --text: #f0f0f0;
     --text2: rgba(255,255,255,0.5);
+    --text3: rgba(255,255,255,0.25);
     --input-bg: rgba(255,255,255,0.06);
     --input-border: rgba(255,255,255,0.1);
   }
@@ -80,6 +81,11 @@
     100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
   /* Card */
   .card {
     background: var(--card);
@@ -108,6 +114,21 @@
     padding: 4px 14px;
     border-radius: 20px;
     margin-bottom: 12px;
+  }
+
+  .header-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .logo-fwc {
+    width: 40px;
+    height: auto;
+    flex-shrink: 0;
+    animation: float 3s ease-in-out infinite;
   }
 
   .header h1 {
@@ -181,7 +202,7 @@
   }
 
   .form-group input::placeholder {
-    color: var(--text2);
+    color: var(--text3);
     font-size: 13px;
   }
 
@@ -323,14 +344,17 @@
     color: var(--accent2);
     font-size: 12px;
     margin-top: 8px;
+    margin-bottom: 8px;
     text-align: center;
     display: none;
+    line-height: 1.5;
   }
 
   /* Responsive */
   @media (max-width: 480px) {
     .card { padding: 24px 18px; border-radius: 20px; }
     .header h1 { font-size: 24px; }
+    .logo-fwc { width: 32px; }
   }
 
   /* Loading spinner */
@@ -371,7 +395,25 @@
     <div class="card">
       <div class="header">
         <div class="badge">Nonton Bareng</div>
-        <h1>Nobar Gembira</h1>
+        <div class="header-logo-row">
+          <!-- World Cup 2026 Trophy SVG icon -->
+          <svg class="logo-fwc" viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 2C48 2 42 6 38 12C34 18 28 20 22 24C16 28 10 38 8 48C6 58 8 68 12 74C16 80 22 82 28 80C34 78 38 74 42 72C46 70 48 70 50 72C52 70 54 70 58 72C62 74 66 78 72 80C78 82 84 80 88 74C92 68 94 58 92 48C90 38 84 28 78 24C72 20 66 18 62 12C58 6 52 2 50 2Z" fill="url(#cupGrad)" stroke="#f0c040" stroke-width="1.5"/>
+            <path d="M30 80L32 100H68L70 80" stroke="#f0c040" stroke-width="2" fill="none"/>
+            <rect x="35" y="100" width="30" height="4" rx="2" fill="#f0c040"/>
+            <rect x="28" y="104" width="44" height="3" rx="1.5" fill="#c0a030"/>
+            <ellipse cx="50" cy="12" rx="4" ry="2" fill="#f0c040" opacity="0.6"/>
+            <ellipse cx="50" cy="12" rx="6" ry="3" fill="none" stroke="#f0c040" stroke-width="0.5" opacity="0.4"/>
+            <defs>
+              <linearGradient id="cupGrad" x1="50" y1="2" x2="50" y2="82">
+                <stop offset="0%" stop-color="#fce68b"/>
+                <stop offset="50%" stop-color="#f0c040"/>
+                <stop offset="100%" stop-color="#c89620"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <h1>Nobar Gembira</h1>
+        </div>
         <h2>Semen Tonasa</h2>
         <div class="worldcup">⚽ Final World Cup 2026</div>
       </div>
@@ -459,7 +501,6 @@
 <script>
 // State
 let juara = '';
-const API = window.location.port ? '' : '';
 let formData = {};
 
 function showPage(id) {
@@ -467,16 +508,32 @@ function showPage(id) {
   document.getElementById(id).classList.add('active');
 }
 
-function daftarHadir() {
+async function apiPost(path, data) {
+  const resp = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const text = await resp.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    throw new Error('Server merespon HTML, bukan JSON. Pastikan akses via http://localhost:8080 bukan file://');
+  }
+}
+
+async function daftarHadir() {
   const nama = document.getElementById('nama').value.trim();
   const sap = document.getElementById('sap').value.trim();
   const unit = document.getElementById('unit_kerja').value.trim();
+  const errEl = document.getElementById('error1');
 
   if (!nama || !sap || !unit) {
-    document.getElementById('error1').style.display = 'block';
+    errEl.textContent = 'Harap isi semua field!';
+    errEl.style.display = 'block';
     return;
   }
-  document.getElementById('error1').style.display = 'none';
+  errEl.style.display = 'none';
 
   const btn = document.getElementById('btnDaftar');
   btn.classList.add('loading');
@@ -484,28 +541,22 @@ function daftarHadir() {
 
   formData = { nama, sap, unit_kerja: unit };
 
-  fetch('/api/daftar-hadir', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(formData)
-  })
-  .then(r => r.json())
-  .then(res => {
+  try {
+    const res = await apiPost('/api/daftar-hadir', formData);
     btn.classList.remove('loading');
     btn.disabled = false;
     if (res.status === 'ok') {
       showPage('page2');
     } else {
-      document.getElementById('error1').textContent = 'Error: ' + res.message;
-      document.getElementById('error1').style.display = 'block';
+      errEl.textContent = 'Error: ' + (res.message || 'Unknown');
+      errEl.style.display = 'block';
     }
-  })
-  .catch(err => {
+  } catch (err) {
     btn.classList.remove('loading');
     btn.disabled = false;
-    document.getElementById('error1').textContent = 'Koneksi error: ' + err.message;
-    document.getElementById('error1').style.display = 'block';
-  });
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
 }
 
 function pilihJuara(team) {
@@ -515,15 +566,17 @@ function pilihJuara(team) {
   else document.getElementById('champ2').classList.add('selected');
 }
 
-function tebakSkor() {
+async function tebakSkor() {
   const skorArg = document.getElementById('skor_arg').value;
   const skorSpa = document.getElementById('skor_spa').value;
+  const errEl = document.getElementById('error2');
 
   if (!juara || skorArg === '' || skorSpa === '') {
-    document.getElementById('error2').style.display = 'block';
+    errEl.textContent = 'Harap pilih juara dan isi skor!';
+    errEl.style.display = 'block';
     return;
   }
-  document.getElementById('error2').style.display = 'none';
+  errEl.style.display = 'none';
 
   const btn = document.getElementById('btnTebak');
   btn.classList.add('loading');
@@ -536,29 +589,23 @@ function tebakSkor() {
     skor_spanyol: parseInt(skorSpa)
   };
 
-  fetch('/api/tebak-skor', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-  .then(r => r.json())
-  .then(res => {
+  try {
+    const res = await apiPost('/api/tebak-skor', payload);
     btn.classList.remove('loading');
     btn.disabled = false;
     if (res.status === 'ok') {
       showPage('page3');
       launchConfetti();
     } else {
-      document.getElementById('error2').textContent = 'Error: ' + res.message;
-      document.getElementById('error2').style.display = 'block';
+      errEl.textContent = 'Error: ' + (res.message || 'Unknown');
+      errEl.style.display = 'block';
     }
-  })
-  .catch(err => {
+  } catch (err) {
     btn.classList.remove('loading');
     btn.disabled = false;
-    document.getElementById('error2').textContent = 'Koneksi error: ' + err.message;
-    document.getElementById('error2').style.display = 'block';
-  });
+    errEl.textContent = err.message;
+    errEl.style.display = 'block';
+  }
 }
 
 function goBack() {
