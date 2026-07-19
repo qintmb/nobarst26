@@ -518,7 +518,7 @@ async function apiPost(path, data) {
   try {
     return JSON.parse(text);
   } catch (e) {
-    throw new Error('Server merespon HTML, bukan JSON. Pastikan akses via http://localhost:8080 bukan file://');
+    throw new Error('Server error. Pastikan Netlify env vars (GOOGLE_REFRESH_TOKEN, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET) sudah diset di dashboard Netlify.');
   }
 }
 
