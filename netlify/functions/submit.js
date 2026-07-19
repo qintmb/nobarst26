@@ -26,6 +26,18 @@ async function appendRow(sheet, values) {
   return data.updates?.updatedCells ?? 0;
 }
 
+/** Check if SAP already exists in the given sheet (column C = index 2) */
+async function sapExists(sheet, sap) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const { data } = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${sheet}!C:C`,
+  });
+  const rows = data.values || [];
+  return rows.some(row => row[0] && row[0].toString().trim() === sap.toString().trim());
+}
+
 const headers = {
   'Content-Type': 'application/json',
   'Access-Control-Allow-Origin': '*',
@@ -52,6 +64,10 @@ exports.handler = async (event) => {
       return { statusCode: 200, headers, body: JSON.stringify({ status: 'ok', cells: c }) };
     }
     if (path.endsWith('/api/tebak-skor')) {
+      // Check 1 device 1 submission
+      if (await sapExists('tebakskor', data.sap)) {
+        return { statusCode: 409, headers, body: JSON.stringify({ error: 'Anda sudah pernah mengisi. 1 device hanya 1x submit.' }) };
+      }
       const c = await appendRow('tebakskor', [
         data.nama || '', data.sap || '', data.unit_kerja || '',
         data.juara || '', String(data.skor_arg ?? ''), String(data.skor_spa ?? ''),

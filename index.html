@@ -466,6 +466,18 @@
 let juara = '';
 let formData = {};
 
+// ===== 1-DEVICE CHECK =====
+(function() {
+  if (localStorage.getItem('nobar_submitted')) {
+    document.getElementById('card1').style.display = 'none';
+    document.getElementById('card2').style.display = 'none';
+    document.getElementById('card1').classList.remove('card');
+    document.getElementById('card2').classList.remove('card');
+    document.querySelector('.dots').style.display = 'none';
+    swipeTo(2);
+  }
+})();
+
 // ===== SWIPE =====
 const wrap = document.getElementById('swipeWrap');
 
@@ -545,6 +557,7 @@ async function kirimTebakan() {
     btn.classList.remove('loading');
     btn.disabled = false;
     if (res.status === 'ok') {
+      localStorage.setItem('nobar_submitted', 'true');
       swipeTo(2);
       launchConfetti();
     } else {
